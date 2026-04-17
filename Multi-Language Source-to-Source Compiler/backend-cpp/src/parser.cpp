@@ -129,7 +129,53 @@ ASTNode* Parser::parseStatement() {
             ifStmt->addChild(std::unique_ptr<ASTNode>(parseStatement()));
         }
         if (!match(Token::TOKEN_RBRACE)) error("Expected }");
+        
+        // Support for optional ELSE
+        if (match(Token::TOKEN_ELSE)) {
+            if (match(Token::TOKEN_LBRACE)) {
+                while (!check(Token::TOKEN_RBRACE) && !isAtEnd()) {
+                    ifStmt->addChild(std::unique_ptr<ASTNode>(parseStatement()));
+                }
+                if (!match(Token::TOKEN_RBRACE)) error("Expected } after else");
+            } else {
+                // Single statement else
+                ifStmt->addChild(std::unique_ptr<ASTNode>(parseStatement()));
+            }
+        }
         return ifStmt;
+    } else if (match(Token::TOKEN_WHILE)) {
+        auto whileStmt = new ASTNode(NODE_WHILE_STATEMENT);
+        if (!match(Token::TOKEN_LPAREN)) error("Expected ( after while");
+        whileStmt->addChild(std::unique_ptr<ASTNode>(parseExpression()));
+        if (!match(Token::TOKEN_RPAREN)) error("Expected ) after while condition");
+        if (!match(Token::TOKEN_LBRACE)) error("Expected { after while condition");
+        while (!check(Token::TOKEN_RBRACE) && !isAtEnd()) {
+            whileStmt->addChild(std::unique_ptr<ASTNode>(parseStatement()));
+        }
+        if (!match(Token::TOKEN_RBRACE)) error("Expected } after while body");
+        return whileStmt;
+    } else if (match(Token::TOKEN_FOR)) {
+        auto forStmt = new ASTNode(NODE_FOR_STATEMENT);
+        if (!match(Token::TOKEN_LPAREN)) error("Expected ( after for");
+        
+        // Initializer
+        forStmt->addChild(std::unique_ptr<ASTNode>(parseStatement()));
+        
+        // Condition
+        forStmt->addChild(std::unique_ptr<ASTNode>(parseExpression()));
+        if (!match(Token::TOKEN_SEMICOLON)) error("Expected ; after for condition");
+        
+        // Increment
+        forStmt->addChild(std::unique_ptr<ASTNode>(parseExpression()));
+        
+        if (!match(Token::TOKEN_RPAREN)) error("Expected ) after for header");
+        if (!match(Token::TOKEN_LBRACE)) error("Expected { after for header");
+        
+        while (!check(Token::TOKEN_RBRACE) && !isAtEnd()) {
+            forStmt->addChild(std::unique_ptr<ASTNode>(parseStatement()));
+        }
+        if (!match(Token::TOKEN_RBRACE)) error("Expected } after for body");
+        return forStmt;
     }
     error("Unexpected token");
     return nullptr;

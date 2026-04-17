@@ -60,50 +60,54 @@ std::string quoted(const std::string& value) {
 }
 
 std::string tokensToJson(const std::vector<Token>& tokens) {
-    std::string json = "[";
+    std::stringstream ss;
+    ss << "[";
     for (size_t i = 0; i < tokens.size(); i++) {
         const auto& token = tokens[i];
-        json += "{";
-        json += "\"type\":" + quoted(token.typeToString()) + ",";
-        json += "\"value\":" + quoted(token.value) + ",";
-        json += "\"line\":" + std::to_string(token.line) + ",";
-        json += "\"column\":" + std::to_string(token.column);
-        json += "}";
-        if (i + 1 < tokens.size()) json += ",";
+        ss << "{\"type\":" << quoted(token.typeToString()) << ",";
+        ss << "\"value\":" << quoted(token.value) << ",";
+        ss << "\"line\":" << token.line << ",";
+        ss << "\"column\":" << token.column << "}";
+        if (i + 1 < tokens.size()) ss << ",";
     }
-    json += "]";
-    return json;
+    ss << "]";
+    return ss.str();
+}
+
+void astToJsonStream(ASTNode* node, std::ostream& ss) {
+    if (!node) {
+        ss << "null";
+        return;
+    }
+    ss << "{\"type\":\"" << std::to_string(node->type) << "\",";
+    ss << "\"value\":" << quoted(node->value) << ",";
+    ss << "\"children\": [";
+    for (size_t i = 0; i < node->children.size(); i++) {
+        astToJsonStream(node->children[i].get(), ss);
+        if (i + 1 < node->children.size()) ss << ",";
+    }
+    ss << "]}";
 }
 
 std::string astToJson(ASTNode* node) {
-    if (!node) return "null";
-    std::string json = "{";
-    json += "\"type\":\"" + std::to_string(node->type) + "\",";
-    json += "\"value\":" + quoted(node->value) + ",";
-    json += "\"children\": [";
-    for (size_t i = 0; i < node->children.size(); i++) {
-        json += astToJson(node->children[i].get());
-        if (i + 1 < node->children.size()) json += ",";
-    }
-    json += "]";
-    json += "}";
-    return json;
+    std::stringstream ss;
+    astToJsonStream(node, ss);
+    return ss.str();
 }
 
 std::string intermediateToJson(const std::vector<Quadruple>& code) {
-    std::string json = "[";
+    std::stringstream ss;
+    ss << "[";
     for (size_t i = 0; i < code.size(); i++) {
         const auto& quad = code[i];
-        json += "{";
-        json += "\"op\":" + quoted(quad.opToString()) + ",";
-        json += "\"arg1\":" + quoted(quad.arg1) + ",";
-        json += "\"arg2\":" + quoted(quad.arg2) + ",";
-        json += "\"result\":" + quoted(quad.result);
-        json += "}";
-        if (i + 1 < code.size()) json += ",";
+        ss << "{\"op\":" << quoted(quad.opToString()) << ",";
+        ss << "\"arg1\":" << quoted(quad.arg1) << ",";
+        ss << "\"arg2\":" << quoted(quad.arg2) << ",";
+        ss << "\"result\":" << quoted(quad.result) << "}";
+        if (i + 1 < code.size()) ss << ",";
     }
-    json += "]";
-    return json;
+    ss << "]";
+    return ss.str();
 }
 
 int main(int argc, char* argv[]) {
