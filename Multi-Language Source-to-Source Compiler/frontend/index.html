@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C/C++ to Multi-Language Compiler</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">C-Transpiler</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="compiler.html">Compiler</a>
+                <a href="#features">Features</a>
+                <a href="#docs">Docs</a>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn btn-outline" id="loginBtn">Login</button>
+                <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Convert C/C++ Code to
+                    <span class="gradient-text">Any Language</span>
+                </h1>
+                <p class="hero-subtitle">
+                    A powerful source-to-source compiler that transforms your C/C++ code 
+                    into Python, Java, or JavaScript with full compiler visualization.
+                </p>
+                <div class="hero-buttons">
+                    <a href="compiler.html" class="btn btn-primary btn-large">
+                        Start Compiling →
+                    </a>
+                    <button class="btn btn-outline btn-large" id="watchDemoBtn">
+                        Watch Demo
+                    </button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Target Languages</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">6</span>
+                        <span class="stat-label">Compiler Phases</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Visualization</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="code-preview">
+                    <div class="code-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="code-title">input.c</span>
+                    </div>
+                    <pre class="code-content"><code><span class="keyword">int</span> <span class="function">main</span>() {
+    <span class="keyword">int</span> x = <span class="number">10</span>;
+    <span class="keyword">if</span> (x > <span class="number">5</span>) {
+        <span class="function">printf</span>(<span class="string">"Hello"</span>);
+    }
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code></pre>
+                </div>
+                <div class="arrow">→</div>
+                <div class="code-preview">
+                    <div class="code-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="code-title">output.py</span>
+                    </div>
+                    <pre class="code-content"><code><span class="keyword">def</span> <span class="function">main</span>():
+    x = <span class="number">10</span>
+    <span class="keyword">if</span> x > <span class="number">5</span>:
+        <span class="function">print</span>(<span class="string">"Hello"</span>)</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Compiler Phases Visualization</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📝</div>
+                        <h3>Lexical Analysis</h3>
+                        <p>Tokenizes source code into meaningful tokens with line/column tracking</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌳</div>
+                        <h3>Syntax Analysis</h3>
+                        <p>Generates Abstract Syntax Tree (AST) with grammar validation</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">✅</div>
+                        <h3>Semantic Analysis</h3>
+                        <p>Type checking, scope resolution, and symbol table management</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Intermediate Code</h3>
+                        <p>Three-address code generation for optimization</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Code Optimization</h3>
+                        <p>Constant folding, dead code elimination, and more</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>Target Generation</h3>
+                        <p>Python, Java, or JavaScript output</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/main.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const isServerUp = await API.checkHealth();
+            if (!isServerUp) {
+                const banner = document.createElement('div');
+                banner.style.backgroundColor = '#ff4d4d';
+                banner.style.color = 'white';
+                banner.style.textAlign = 'center';
+                banner.style.padding = '10px';
+                banner.style.position = 'fixed';
+                banner.style.top = '0';
+                banner.style.left = '0';
+                banner.style.width = '100%';
+                banner.style.zIndex = '9999';
+                banner.innerHTML = '⚠️ Laravel backend is not running. Please run <code>php artisan serve</code> in the backend folder.';
+                document.body.prepend(banner);
+            }
+        });
+    </script>
+</body>
+</html>
