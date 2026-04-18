@@ -79,8 +79,36 @@ void astToJsonStream(ASTNode* node, std::ostream& ss) {
         ss << "null";
         return;
     }
-    ss << "{\"type\":\"" << std::to_string(node->type) << "\",";
+    
+    std::string typeName;
+    switch (node->type) {
+        case NODE_PROGRAM: typeName = "Program"; break;
+        case NODE_FUNCTION: typeName = "Function"; break;
+        case NODE_VARIABLE_DECL: typeName = "VariableDecl"; break;
+        case NODE_ASSIGNMENT: typeName = "Assignment"; break;
+        case NODE_BINARY_OP: typeName = "BinaryOp"; break;
+        case NODE_UNARY_OP: typeName = "UnaryOp"; break;
+        case NODE_IF_STATEMENT: typeName = "IfStatement"; break;
+        case NODE_WHILE_LOOP: typeName = "WhileLoop"; break;
+        case NODE_FOR_LOOP: typeName = "ForLoop"; break;
+        case NODE_SWITCH_STATEMENT: typeName = "SwitchStatement"; break;
+        case NODE_CASE_STATEMENT: typeName = "CaseStatement"; break;
+        case NODE_BREAK_STATEMENT: typeName = "BreakStatement"; break;
+        case NODE_CONTINUE_STATEMENT: typeName = "ContinueStatement"; break;
+        case NODE_RETURN_STATEMENT: typeName = "ReturnStatement"; break;
+        case NODE_CALL_EXPRESSION: typeName = "CallExpression"; break;
+        case NODE_NUMBER_LITERAL: typeName = "NumberLiteral"; break;
+        case NODE_STRING_LITERAL: typeName = "StringLiteral"; break;
+        case NODE_IDENTIFIER: typeName = "Identifier"; break;
+        case NODE_PARAMETER: typeName = "Parameter"; break;
+        case NODE_BLOCK: typeName = "Block"; break;
+        default: typeName = "Unknown";
+    }
+    
+    ss << "{\"type\":\"" << typeName << "\",";
     ss << "\"value\":" << quoted(node->value) << ",";
+    ss << "\"line\":" << node->line << ",";
+    ss << "\"column\":" << node->column << ",";
     ss << "\"children\": [";
     for (size_t i = 0; i < node->children.size(); i++) {
         astToJsonStream(node->children[i].get(), ss);
@@ -121,6 +149,12 @@ int main(int argc, char* argv[]) {
         std::string targetLanguage = argv[2];
         std::string outputFile = argv[3];
         
+        // Validate target language
+        if (targetLanguage != "python" && targetLanguage != "java" && 
+            targetLanguage != "javascript" && targetLanguage != "cpp") {
+            throw std::runtime_error("Unsupported target language: " + targetLanguage);
+        }
+        
         // Phase 1: Read source code
         std::string sourceCode = readFile(inputFile);
         
@@ -155,6 +189,7 @@ int main(int argc, char* argv[]) {
         // Write output
         writeFile(outputFile, targetCode);
         
+        // Output JSON for frontend
         std::cout << "---COMPILER_OUTPUT_START---\n";
         std::cout << "{";
         std::cout << "\"success\":true,";
@@ -171,9 +206,9 @@ int main(int argc, char* argv[]) {
         return 0;
         
     } catch (const std::exception& e) {
-        std::cerr << "---COMPILER_OUTPUT_START---\n";
-        std::cerr << "{\"success\":false,\"error\":" << quoted(e.what()) << "}" << std::endl;
-        std::cerr << "---COMPILER_OUTPUT_END---\n";
-        return 1;
+        std::cout << "---COMPILER_OUTPUT_START---\n";
+        std::cout << "{\"success\":false,\"error\":" << quoted(e.what()) << "}" << std::endl;
+        std::cout << "---COMPILER_OUTPUT_END---\n";
+        return 0;
     }
 }

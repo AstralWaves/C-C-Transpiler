@@ -1,0 +1,22 @@
+{
+  "name": "c-transpiler-backend",
+  "version": "1.0.0",
+  "description": "C/C++ to Multi-Language Transpiler",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "g++ -std=c++17 -O2 src/*.cpp -o compiler"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

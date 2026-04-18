@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include "symbol_table.h"
 #include "intermediate_code.h"
 
@@ -18,8 +19,16 @@ private:
     std::string generatePython(const std::vector<Quadruple>& code);
     std::string generateJava(const std::vector<Quadruple>& code);
     std::string generateJavaScript(const std::vector<Quadruple>& code);
+    std::string generateCpp(const std::vector<Quadruple>& code);
     
     std::string convertExpression(const std::string& expr);
+    std::string formatPrintfString(const std::string& format);
+    std::string formatPrintfStringUtilJs(const std::string& format);
+    std::string convertPrintfToJava(const std::string& format);
+    std::string convertPrintfToJs(const std::string& format);
+    std::string emitOperatorQuad(const Quadruple& quad);
+    std::string javaIntCondition(const std::string& expr);
+    std::string jsEmitPrintf(const Quadruple& quad);
     std::string getTypeMapping(const std::string& cType);
     std::string indent(int level);
     

@@ -1,3 +1,4 @@
+// PHASE 1: LEXICAL ANALYSIS (TOKENIZER)
 #include "../include/lexer.h"
 #include <cctype>
 #include <iostream>
@@ -17,6 +18,9 @@ Lexer::Lexer(const std::string& src)
     keywords["return"] = Token::TOKEN_RETURN;
     keywords["break"] = Token::TOKEN_BREAK;
     keywords["continue"] = Token::TOKEN_CONTINUE;
+    keywords["switch"] = Token::TOKEN_SWITCH;
+    keywords["case"] = Token::TOKEN_CASE;
+    keywords["default"] = Token::TOKEN_DEFAULT;
     keywords["include"] = Token::TOKEN_INCLUDE;
     keywords["printf"] = Token::TOKEN_PRINTF;
     keywords["scanf"] = Token::TOKEN_SCANF;
@@ -35,6 +39,9 @@ std::string Token::typeToString() const {
         case TOKEN_RETURN: return "KEYWORD_RETURN";
         case TOKEN_BREAK: return "KEYWORD_BREAK";
         case TOKEN_CONTINUE: return "KEYWORD_CONTINUE";
+        case TOKEN_SWITCH: return "KEYWORD_SWITCH";
+        case TOKEN_CASE: return "KEYWORD_CASE";
+        case TOKEN_DEFAULT: return "KEYWORD_DEFAULT";
         case TOKEN_INCLUDE: return "KEYWORD_INCLUDE";
         case TOKEN_PRINTF: return "FUNCTION_PRINTF";
         case TOKEN_SCANF: return "FUNCTION_SCANF";
@@ -56,6 +63,9 @@ std::string Token::typeToString() const {
         case TOKEN_AND: return "OPERATOR_AND";
         case TOKEN_OR: return "OPERATOR_OR";
         case TOKEN_NOT: return "OPERATOR_NOT";
+        case TOKEN_AMPERSAND: return "OPERATOR_AMPERSAND";
+        case TOKEN_INCREMENT: return "OPERATOR_INCREMENT";
+        case TOKEN_DECREMENT: return "OPERATOR_DECREMENT";
         case TOKEN_SEMICOLON: return "SEPARATOR_SEMICOLON";
         case TOKEN_COMMA: return "SEPARATOR_COMMA";
         case TOKEN_LPAREN: return "SEPARATOR_LPAREN";
@@ -64,6 +74,7 @@ std::string Token::typeToString() const {
         case TOKEN_RBRACE: return "SEPARATOR_RBRACE";
         case TOKEN_LBRACKET: return "SEPARATOR_LBRACKET";
         case TOKEN_RBRACKET: return "SEPARATOR_RBRACKET";
+        case TOKEN_COLON: return "SEPARATOR_COLON";
         case TOKEN_EOF: return "EOF";
         case TOKEN_ERROR: return "ERROR";
         default: return "UNKNOWN";
@@ -73,6 +84,11 @@ std::string Token::typeToString() const {
 char Lexer::peek() const {
     if (position >= source.length()) return '\0';
     return source[position];
+}
+
+char Lexer::peekNext() const {
+    if (position + 1 >= source.length()) return '\0';
+    return source[position + 1];
 }
 
 char Lexer::getChar() {
@@ -93,30 +109,33 @@ void Lexer::skipWhitespace() {
     }
 }
 
-void Lexer::skipComment() {
+bool Lexer::skipComment() {
     if (peek() == '/') {
-        char next = position + 1 < source.length() ? source[position + 1] : '\0';
+        char next = peekNext();
         if (next == '/' || next == '*') {
-            getChar();
+            getChar(); // consume '/'
             if (peek() == '/') {
                 // Single-line comment
                 while (peek() != '\n' && peek() != '\0') {
                     getChar();
                 }
+                return true;
             } else if (peek() == '*') {
                 // Multi-line comment
-                getChar();
+                getChar(); // consume '*'
                 while (true) {
                     char c = getChar();
                     if (c == '*' && peek() == '/') {
-                        getChar();
+                        getChar(); // consume '/'
                         break;
                     }
                     if (c == '\0') break;
                 }
+                return true;
             }
         }
     }
+    return false;
 }
 
 Token Lexer::readIdentifier() {
@@ -185,24 +204,23 @@ std::vector<Token> Lexer::tokenize() {
     while (peek() != '\0') {
         skipWhitespace();
         
-        char c = peek();
-        
-        if (c == '\0') break;
-        
         // Skip comments
-        if (c == '/') {
-            skipComment();
-            continue;
+        if (peek() == '/') {
+            if (skipComment()) continue;
         }
         
-        // Preprocessor (Skip #include)
-        if (c == '#') {
+        // Preprocessor directives (skip #include, #define, etc.)
+        if (peek() == '#') {
             while (peek() != '\n' && peek() != '\0') {
                 getChar();
             }
+            if (peek() == '\n') getChar(); // Skip the newline too
             continue;
         }
 
+        char c = peek();
+        if (c == '\0') break;
+        
         // Identifiers and keywords
         if (isalpha(c) || c == '_') {
             tokens.push_back(readIdentifier());
@@ -223,8 +241,24 @@ std::vector<Token> Lexer::tokenize() {
         
         // Operators and separators
         switch (c) {
-            case '+': addToken(Token::TOKEN_PLUS, "+"); getChar(); break;
-            case '-': addToken(Token::TOKEN_MINUS, "-"); getChar(); break;
+            case '+': 
+                getChar();
+                if (peek() == '+') {
+                    addToken(Token::TOKEN_INCREMENT, "++");
+                    getChar();
+                } else {
+                    addToken(Token::TOKEN_PLUS, "+");
+                }
+                break;
+            case '-': 
+                getChar();
+                if (peek() == '-') {
+                    addToken(Token::TOKEN_DECREMENT, "--");
+                    getChar();
+                } else {
+                    addToken(Token::TOKEN_MINUS, "-");
+                }
+                break;
             case '*': addToken(Token::TOKEN_MULTIPLY, "*"); getChar(); break;
             case '/': addToken(Token::TOKEN_DIVIDE, "/"); getChar(); break;
             case '%': addToken(Token::TOKEN_MODULO, "%"); getChar(); break;
@@ -269,6 +303,8 @@ std::vector<Token> Lexer::tokenize() {
                 if (peek() == '&') {
                     addToken(Token::TOKEN_AND, "&&");
                     getChar();
+                } else {
+                    addToken(Token::TOKEN_AMPERSAND, "&");
                 }
                 break;
             case '|':
@@ -279,6 +315,7 @@ std::vector<Token> Lexer::tokenize() {
                 }
                 break;
             case ';': addToken(Token::TOKEN_SEMICOLON, ";"); getChar(); break;
+            case ':': addToken(Token::TOKEN_COLON, ":"); getChar(); break;
             case ',': addToken(Token::TOKEN_COMMA, ","); getChar(); break;
             case '(': addToken(Token::TOKEN_LPAREN, "("); getChar(); break;
             case ')': addToken(Token::TOKEN_RPAREN, ")"); getChar(); break;

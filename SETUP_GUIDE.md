@@ -43,28 +43,23 @@
 ### 1. Backend Compilation (One-time setup)
 
 ```bash
-cd backend-cpp
-g++ -Iinclude -std=c++11 src/main.cpp src/lexer.cpp src/parser.cpp src/semantic.cpp \
-    src/intermediate_code.cpp src/optimizer.cpp src/symbol_table.cpp \
-    src/codegen/code_generator.cpp -o build/compiler.exe
+cd "Multi-Language Source-to-Source Compiler/backend-cpp"
+g++ -Iinclude -std=c++11 src/*.cpp src/codegen/code_generator.cpp -o build/compiler.exe
 ```
 
 ### 2. PHP Frontend Server
 
 ```bash
-# If using PHP built-in server (development only):
-cd php-backend
-php -S localhost:8000
-
-# Visit: http://localhost:8000/api/compile
+cd "Multi-Language Source-to-Source Compiler/php-backend-laravel"
+php artisan serve --port=8000
 ```
 
 ### 3. HTML Frontend
 
-Simply open `frontend/compiler.html` in a browser or serve via HTTP:
+Simply open `Multi-Language Source-to-Source Compiler/frontend/compiler.html` in a browser or serve via HTTP:
 
 ```bash
-cd frontend
+cd "Multi-Language Source-to-Source Compiler/frontend"
 python -m http.server 8001
 # Visit: http://localhost:8001/compiler.html
 ```

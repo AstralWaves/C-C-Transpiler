@@ -30,14 +30,21 @@ struct Quadruple {
         OP_PARAM,
         OP_LABEL,
         OP_IF,
+        OP_ELSE_IF,
         OP_ELSE,
         OP_WHILE,
         OP_FOR,
+        OP_SWITCH,
+        OP_CASE,
+        OP_BREAK,
+        OP_CONTINUE,
+        OP_EXIT,
         OP_PRINTF,
         OP_SCANF,
         OP_RETURN,
         OP_FUNC_START,
-        OP_FUNC_END
+        OP_FUNC_END,
+        OP_BLOCK_END
     };
     
     Op op;

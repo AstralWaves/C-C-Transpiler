@@ -16,6 +16,7 @@ private:
     Token advance();
     bool check(Token::Type type) const;
     bool match(Token::Type type);
+    bool checkIdentifierFollowedByAssign() const;
     void error(const std::string& message);
     
     ASTNode* parseProgram();
